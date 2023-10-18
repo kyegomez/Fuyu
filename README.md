@@ -12,12 +12,10 @@ A implementation of Fuyu from Adept in pytorch using Zeta primitives
 * Agorians
 * Adept
 
-
-
 # Install
-`fuyu`
+`pip install fuyu`
 
-# Usage
+
 
 # Architecture
 image patches -> linear projection -> decoder llm
