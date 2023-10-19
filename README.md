@@ -15,12 +15,15 @@ A implementation of Fuyu from Adept in pytorch using Zeta primitives
 # Install
 `pip install fuyu`
 
+## Usage
+```python
 
+
+```
 
 # Architecture
-image patches -> linear projection -> decoder llm
+image patch embeddings -> linear projection -> decoder llm
 
-# Todo
 
 
 # License
