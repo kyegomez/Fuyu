@@ -910,4 +910,4 @@ class FuyuProcessor(ProcessorMixin):
 # FuyuImageProcessor example
 image_processor = FuyuImageProcessor()
 image = PIL.Image.open("agorabanner.png")
-test = image_processor(image)
+test = image_processor.apply_transformation(image)
