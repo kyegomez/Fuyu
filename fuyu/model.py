@@ -1,9 +1,7 @@
 import torch
 from torch.nn import Module
 from zeta.structs import AutoregressiveWrapper, Decoder, Transformer
-
-from fuyu.utils import ImgToTransformer
-
+from zeta.nn import image_to_text 
 
 def exists(val):
     return val is not None
@@ -100,17 +98,6 @@ class Fuyu(Module):
             # Autoregressive wrapper for the model
             self.decoder = AutoregressiveWrapper(self.Fuyu)
 
-            # Takes in imgs -> patches them -> transforms them to the same dimension as the model
-            self.img_to_transformer = ImgToTransformer(
-                patches=patches,
-                patch_size=patch_size,
-                transformer_dim=dim,
-                img_channels=img_channels,
-                seq_len=num_tokens,
-                reduced_dim=dim,
-                *args,
-                **kwargs
-            )
 
         except Exception as e:
             print("Failed to initialize Fuyu: ", e)
@@ -120,7 +107,6 @@ class Fuyu(Module):
         self,
         text: torch.Tensor,
         img: torch.Tensor = None,
-        audio: torch.Tensor = None,
         *args,
         **kwargs
     ):
