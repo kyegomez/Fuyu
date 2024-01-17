@@ -173,20 +173,12 @@ class Fuyu(Module):
 
 
         """
-        # print(f"Printing text shape: {text.shape}")
         try:
             # If image is provided, concat it with the text
             if exists(img):
                 # Patch the image
                 img = patch_img(img, patches=self.patches)
-                # print(f"Printing img when patched shape: {img.shape}")
-                # img = img_to_text(img, self.max_seq_len, self.dim, True)
                 img = threed_to_text(img, self.max_seq_len, self.dim, True)
-                # img = text_to_twod(img, self.max_seq_len)
-                # print(f"Printing img shape after img_to_text: {img.shape}")
-                # Concat the text and image
-                # text = torch.cat((text, img), dim=1)
-                # x = torch.cat((text, img), dim=1)
             return self.decoder(text, context=img, *args, **kwargs)
         except Exception as e:
             print("Failed in forward method: ", e)
