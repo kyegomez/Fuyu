@@ -1,7 +1,7 @@
 import torch
 from torch.nn import Module
 from zeta.structs import AutoregressiveWrapper, Decoder, Transformer
-from zeta.nn import image_to_text 
+
 
 def exists(val):
     return val is not None
@@ -31,8 +31,8 @@ class Fuyu(Module):
     - attn_qk_norm: Attention query-key normalization
     - attn_qk_norm_dim_scale: Attention query-key normalization dimension scale
     - embedding_provider: Embedding provider module
-    
-    
+
+
     Example:
     >>> import torch
     >>> from fuyu import Fuyu
@@ -41,7 +41,7 @@ class Fuyu(Module):
     >>> y = model(x)
     >>> y.shape
     torch.Size([1, 128, 128])
-    
+
 
     """
 
@@ -98,18 +98,11 @@ class Fuyu(Module):
             # Autoregressive wrapper for the model
             self.decoder = AutoregressiveWrapper(self.Fuyu)
 
-
         except Exception as e:
             print("Failed to initialize Fuyu: ", e)
             raise
 
-    def forward(
-        self,
-        text: torch.Tensor,
-        img: torch.Tensor = None,
-        *args,
-        **kwargs
-    ):
+    def forward(self, text: torch.Tensor, img: torch.Tensor = None, *args, **kwargs):
         """
         Forward pass of the model.
 
