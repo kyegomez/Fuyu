@@ -13,7 +13,8 @@ def patch_img(x: Tensor, patches: int):
     return rearrange(
         x, "b c (h p1) (w p2) -> b (h w) (p1 p2 c)", p1=patches, p2=patches
     )
-    
+
+
 def threed_to_text(x: Tensor, max_seq_len: int, dim: int, flatten: bool = False):
     """
     Converts a 3D tensor to text representation.
@@ -28,14 +29,13 @@ def threed_to_text(x: Tensor, max_seq_len: int, dim: int, flatten: bool = False)
         Tensor: The output tensor of shape (batch_size, max_seq_len, input_dim).
     """
     b, s, d = x.shape
-    
+
     x = nn.Linear(d, dim)(x)
-    
+
     x = rearrange(x, "b s d -> b d s")
     x = nn.Linear(s, max_seq_len)(x)
     x = rearrange(x, "b d s -> b s d")
     return x
-
 
 
 def text_to_twod(x: Tensor, dim: int):
@@ -43,6 +43,7 @@ def text_to_twod(x: Tensor, dim: int):
     x = reduce(x, "b s d -> b d", "mean")
     x = nn.Linear(d, dim)(x)
     return x
+
 
 class Fuyu(Module):
     """
@@ -140,7 +141,7 @@ class Fuyu(Module):
                     qk_norm=qk_norm,
                     attn_qk_norm=attn_qk_norm,
                     attn_qk_norm_dim_scale=attn_qk_norm_dim_scale,
-                    cross_attend=True, 
+                    cross_attend=True,
                     *args,
                     **kwargs
                 ),
