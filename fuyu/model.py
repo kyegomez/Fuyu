@@ -15,7 +15,9 @@ def patch_img(x: Tensor, patches: int):
     )
 
 
-def threed_to_text(x: Tensor, max_seq_len: int, dim: int, flatten: bool = False):
+def threed_to_text(
+    x: Tensor, max_seq_len: int, dim: int, flatten: bool = False
+):
     """
     Converts a 3D tensor to text representation.
 
@@ -49,9 +51,9 @@ class Fuyu(Module):
     """
     Fuyu is an implementation of the Fuyu model by Adept AI.
     The model is a transformer-based model that can be used for various tasks such as image classification, object detection, and more.
-    
+
     Args:
-    - num_tokens (int): The number of tokens in the input vocabulary   
+    - num_tokens (int): The number of tokens in the input vocabulary
     - max_seq_len (int): The maximum sequence length of the input
     - dim (int): The dimension of the model
     - depth (int): The depth of the model
@@ -77,7 +79,7 @@ class Fuyu(Module):
     - rotary_pos_emb (bool): Whether to use rotary positional embeddings
     - sandwich_norm (bool): Whether to use sandwich normalization
     - ff_post_act_ln (bool): Whether to use feedforward post-activation layer normalization
-    
+
     Example:
     >>> import torch
     >>> from fuyu.model import Fuyu
@@ -146,7 +148,7 @@ class Fuyu(Module):
         sandwich_norm: bool = True,
         ff_post_act_ln: bool = True,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__()
         self.num_tokens = num_tokens
@@ -166,8 +168,7 @@ class Fuyu(Module):
         self.attn_qk_norm_dim_scale = attn_qk_norm_dim_scale
         self.patches = patches
         self.stabilize = stabilize
-        
-        
+
         # Transformer model for the model
         self.fuyu = Transformer(
             num_tokens=num_tokens,
@@ -197,17 +198,18 @@ class Fuyu(Module):
                 sandwich_norm=sandwich_norm,
                 ff_post_act_ln=ff_post_act_ln,
                 *args,
-                **kwargs
+                **kwargs,
             ),
         )
 
         # Autoregressive wrapper for the model
         self.decoder = AutoregressiveWrapper(self.fuyu)
-        
+
         self.s_norm = nn.LayerNorm(dim)
 
-
-    def forward(self, text: torch.Tensor, img: torch.Tensor = None, *args, **kwargs):
+    def forward(
+        self, text: torch.Tensor, img: torch.Tensor = None, *args, **kwargs
+    ):
         """
         Forward pass of the model.
 
