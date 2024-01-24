@@ -47,38 +47,72 @@ def text_to_twod(x: Tensor, dim: int):
 
 class Fuyu(Module):
     """
-    Fuyu model class.
-
-
+    Fuyu is an implementation of the Fuyu model by Adept AI.
+    The model is a transformer-based model that can be used for various tasks such as image classification, object detection, and more.
+    
     Args:
-    - num_tokens: Number of tokens in the vocabulary
-    - max_seq_len: Maximum sequence length
-    - dim: Dimension of the model
-    - depth: Depth of the model
-    - dim_head: Dimension of the model head
-    - heads: Number of heads
-    - use_abs_pos_emb: Whether to use absolute position embedding
-    - alibi_pos_bias: Alibi position bias
-    - alibi_num_heads: Number of alibi heads
-    - rotary_xpos: Rotary position
-    - attn_flash: Attention flash
-    - deepnorm: Deep normalization
-    - shift_tokens: Number of tokens to shift
-    - attn_one_kv_head: Attention one key/value head
-    - qk_norm: Query-key normalization
-    - attn_qk_norm: Attention query-key normalization
-    - attn_qk_norm_dim_scale: Attention query-key normalization dimension scale
-    - embedding_provider: Embedding provider module
-
-
+    - num_tokens (int): The number of tokens in the input vocabulary   
+    - max_seq_len (int): The maximum sequence length of the input
+    - dim (int): The dimension of the model
+    - depth (int): The depth of the model
+    - dim_head (int): The dimension of the heads
+    - heads (int): The number of heads
+    - use_abs_pos_emb (bool): Whether to use absolute positional embeddings
+    - alibi_pos_bias (bool): Whether to use alibi positional bias
+    - alibi_num_heads (int): The number of heads for alibi positional bias
+    - rotary_xpos (bool): Whether to use rotary positional embeddings
+    - attn_flash (bool): Whether to use attention flash
+    - attn_kv_heads (int): The number of heads for attention key-value
+    - qk_norm (bool): Whether to use query key normalization
+    - attn_qk_norm (bool): Whether to use attention query key normalization
+    - attn_qk_norm_dim_scale (bool): Whether to use attention query key normalization dimension scale
+    - patches (int): The number of patches
+    - stabilize (bool): Whether to use stabilization
+    - use_rmsnorm (bool): Whether to use RMSNorm
+    - use_simple_rmsnorm (bool): Whether to use simple RMSNorm
+    - ff_glu (bool): Whether to use feedforward GLU
+    - ff_swish (bool): Whether to use feedforward Swish
+    - macaron (bool): Whether to use macaron
+    - rel_pos_bias (bool): Whether to use relative positional bias
+    - rotary_pos_emb (bool): Whether to use rotary positional embeddings
+    - sandwich_norm (bool): Whether to use sandwich normalization
+    - ff_post_act_ln (bool): Whether to use feedforward post-activation layer normalization
+    
     Example:
     >>> import torch
-    >>> from fuyu import Fuyu
-    >>> model = Fuyu()
-    >>> x = torch.randn(1, 3, 256, 256)
-    >>> y = model(x)
-    >>> y.shape
-    torch.Size([1, 128, 128])
+    >>> from fuyu.model import Fuyu
+    >>>
+    >>> # Initialize model
+    >>> model = Fuyu(
+    >>>     num_tokens=20342,
+    >>>     max_seq_len=4092,
+    >>>     dim=640,
+    >>>     depth=8,
+    >>>     dim_head=128,
+    >>>     heads=6,
+    >>>     use_abs_pos_emb=False,
+    >>>     alibi_pos_bias=True,
+    >>>     alibi_num_heads=3,
+    >>>     rotary_xpos=True,
+    >>>     attn_flash=True,
+    >>>     attn_kv_heads=2,
+    >>>     qk_norm=False,
+    >>>     attn_qk_norm=False,
+    >>>     attn_qk_norm_dim_scale=False,
+    >>>     patches=16,
+    >>> )
+    >>>
+    >>> # Text shape: [batch, seq_len, dim]
+    >>> text = torch.randint(0, 20342, (1, 4092))
+    >>>
+    >>> # Img shape: [batch, channels, height, width]
+    >>> img = torch.randn(1, 3, 256, 256)
+    >>>
+    >>> # Apply model to text and img
+    >>> y = model(text, img)
+    >>>
+    >>> # Output shape: [batch, seq_len, dim]
+    >>> print(y)
 
 
     """
@@ -101,6 +135,16 @@ class Fuyu(Module):
         attn_qk_norm=True,
         attn_qk_norm_dim_scale=True,
         patches: int = 16,
+        stabilize: bool = True,
+        use_rmsnorm: bool = True,
+        use_simple_rmsnorm: bool = False,
+        ff_glu: bool = True,
+        ff_swish: bool = True,
+        macaron: bool = False,
+        rel_pos_bias: bool = False,
+        rotary_pos_emb: bool = False,
+        sandwich_norm: bool = True,
+        ff_post_act_ln: bool = True,
         *args,
         **kwargs
     ):
@@ -121,38 +165,47 @@ class Fuyu(Module):
         self.attn_qk_norm = attn_qk_norm
         self.attn_qk_norm_dim_scale = attn_qk_norm_dim_scale
         self.patches = patches
+        self.stabilize = stabilize
+        
+        
+        # Transformer model for the model
+        self.fuyu = Transformer(
+            num_tokens=num_tokens,
+            max_seq_len=max_seq_len,
+            use_abs_pos_emb=use_abs_pos_emb,
+            attn_layers=Decoder(
+                dim=dim,
+                depth=depth,
+                dim_head=dim_head,
+                heads=heads,
+                alibi_pos_bias=alibi_pos_bias,
+                alibi_num_heads=alibi_num_heads,
+                rotary_xpos=rotary_xpos,
+                attn_flash=attn_flash,
+                attn_kv_heads=attn_kv_heads,
+                qk_norm=qk_norm,
+                attn_qk_norm=attn_qk_norm,
+                attn_qk_norm_dim_scale=attn_qk_norm_dim_scale,
+                cross_attend=True,
+                use_rmsnorm=use_rmsnorm,
+                use_simple_rmsnorm=use_simple_rmsnorm,
+                ff_glu=ff_glu,
+                ff_swish=ff_swish,
+                macaron=macaron,
+                rel_pos_bias=rel_pos_bias,
+                rotary_pos_emb=rotary_pos_emb,
+                sandwich_norm=sandwich_norm,
+                ff_post_act_ln=ff_post_act_ln,
+                *args,
+                **kwargs
+            ),
+        )
 
-        try:
-            # Transformer model for the model
-            self.Fuyu = Transformer(
-                num_tokens=num_tokens,
-                max_seq_len=max_seq_len,
-                use_abs_pos_emb=use_abs_pos_emb,
-                attn_layers=Decoder(
-                    dim=dim,
-                    depth=depth,
-                    dim_head=dim_head,
-                    heads=heads,
-                    alibi_pos_bias=alibi_pos_bias,
-                    alibi_num_heads=alibi_num_heads,
-                    rotary_xpos=rotary_xpos,
-                    attn_flash=attn_flash,
-                    attn_kv_heads=attn_kv_heads,
-                    qk_norm=qk_norm,
-                    attn_qk_norm=attn_qk_norm,
-                    attn_qk_norm_dim_scale=attn_qk_norm_dim_scale,
-                    cross_attend=True,
-                    *args,
-                    **kwargs
-                ),
-            )
+        # Autoregressive wrapper for the model
+        self.decoder = AutoregressiveWrapper(self.fuyu)
+        
+        self.s_norm = nn.LayerNorm(dim)
 
-            # Autoregressive wrapper for the model
-            self.decoder = AutoregressiveWrapper(self.Fuyu)
-
-        except Exception as e:
-            print("Failed to initialize Fuyu: ", e)
-            raise
 
     def forward(self, text: torch.Tensor, img: torch.Tensor = None, *args, **kwargs):
         """
@@ -179,6 +232,7 @@ class Fuyu(Module):
                 # Patch the image
                 img = patch_img(img, patches=self.patches)
                 img = threed_to_text(img, self.max_seq_len, self.dim, True)
+                img = self.s_norm(img)
             return self.decoder(text, context=img, *args, **kwargs)
         except Exception as e:
             print("Failed in forward method: ", e)

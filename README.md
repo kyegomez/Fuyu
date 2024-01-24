@@ -5,6 +5,9 @@
 
 A implementation of Fuyu, the multimodal AI model from Adept in pytorch and zeta. The architecture is basically instead of using an encoder like VIT or CLIP they just patch the image then project it then feed it into the transformer decoder. The architecture is image patch embeddings -> linear projection -> decoder llm. 
 
+**UPDATE**
+- [Fuyu-Heavy:](https://www.adept.ai/blog/adept-fuyu-heavy) proposes that scaling up the model architecture works but with some caveats. They need more stabilization during training. I have refactored the base Fuyu model implementation to include RMSNorm, LayerNorm, Swish, and a vast array of other techniques to radically increase multi-modal training such as normalizing the image during the shape rearrange and after.
+
 
 [Blog paper code](https://www.adept.ai/blog/fuyu-8b)
 
