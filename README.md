@@ -62,7 +62,14 @@ print(y)
 
 ```
 
+
+# Citation
+
+
+
 # License
 MIT
 
-# Citations
+
+# Todo
+- [ ] Implement DPO with Fuyu
