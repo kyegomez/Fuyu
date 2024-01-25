@@ -19,6 +19,9 @@ model = Fuyu(
     attn_qk_norm=False,
     attn_qk_norm_dim_scale=False,
     patches=16,
+    stabilize=True,
+    use_rmsnorm=True,
+    
 )
 
 # Text shape: [batch, seq_len, dim]

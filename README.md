@@ -8,6 +8,9 @@ A implementation of Fuyu, the multimodal AI model from Adept in pytorch and zeta
 **UPDATE**
 - [Fuyu-Heavy:](https://www.adept.ai/blog/adept-fuyu-heavy) proposes that scaling up the model architecture works but with some caveats. They need more stabilization during training. I have refactored the base Fuyu model implementation to include RMSNorm, LayerNorm, Swish, and a vast array of other techniques to radically increase multi-modal training such as normalizing the image during the shape rearrange and after.
 
+- DPO Confirmed [HERE](https://twitter.com/code_monet/status/1750218951832035580)
+
+
 
 [Blog paper code](https://www.adept.ai/blog/fuyu-8b)
 
