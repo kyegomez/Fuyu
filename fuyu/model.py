@@ -3,7 +3,6 @@ from torch import nn, Tensor
 from einops import rearrange, reduce
 from torch.nn import Module
 from zeta.structs import AutoregressiveWrapper, Decoder, Transformer
-from zeta import DPO
 
 def exists(val):
     return val is not None
@@ -207,9 +206,6 @@ class Fuyu(Module):
 
         self.s_norm = nn.LayerNorm(dim)
         
-        self.dpo = DPO(
-            
-        )
 
     def forward(
         self, text: torch.Tensor, img: torch.Tensor = None, *args, **kwargs
